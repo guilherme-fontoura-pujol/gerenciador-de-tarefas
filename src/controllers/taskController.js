@@ -1,5 +1,4 @@
-// controllers/taskController.js
-const db = require('../database'); // Conexão com o banco de dados
+const db = require('../database.js'); // Caminho corrigido
 
 // Função para listar todas as tarefas
 exports.getAllTasks = async (req, res) => {

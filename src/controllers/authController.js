@@ -1,56 +1,65 @@
-// controllers/authController.js
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const User = require('../models/User'); // Ajuste o caminho para o modelo User
+const User = require('../models/User');
 
-const SECRET_KEY = process.env.SECRET_KEY || 'secretkey';
+// Função para gerar o token JWT
+function generateToken(user) {
+  return jwt.sign({ userId: user.id, email: user.email }, process.env.JWT_SECRET, {
+    expiresIn: '1h',
+  });
+}
 
-exports.register = async (req, res) => {
-    const { email, password } = req.body;
+// Registro de usuário
+const register = async (req, res) => {
+  console.log('Rota /register foi chamada', req.body); // Log para depuração
+  const { email, password, name, picture } = req.body;
 
-    try {
-        if (!email || !password) {
-            return res.status(400).json({ error: 'Email e senha são obrigatórios' });
-        }
+  if (!email || !password || !name) {
+    return res.status(400).json({ error: 'Todos os campos obrigatórios devem ser preenchidos!' });
+  }
 
-        const existingUser = await User.findByEmail(email);
-        if (existingUser) {
-            return res.status(400).json({ error: 'Usuário já existe' });
-        }
-
-        const passwordHash = await bcrypt.hash(password, 10);
-        await User.create({ email, password: passwordHash });
-
-        res.status(201).json({ message: 'Usuário criado com sucesso' });
-    } catch (error) {
-        console.error('Erro ao registrar usuário:', error);
-        res.status(500).json({ error: 'Erro interno do servidor' });
+  try {
+    const existingUser = await User.findByEmail(email);
+    if (existingUser) {
+      return res.status(400).json({ error: 'Este email já está em uso.' });
     }
+
+    const hashedPassword = bcrypt.hashSync(password, 10);
+    const newUser = { email, password: hashedPassword, name, picture };
+
+    await User.create(newUser);
+    res.status(201).json({ message: 'Usuário registrado com sucesso!' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erro ao criar o usuário.' });
+  }
 };
 
-exports.login = async (req, res) => {
-    const { email, password } = req.body;
+// Login de usuário
+const login = async (req, res) => {
+  const { email, password } = req.body;
 
-    try {
-        if (!email || !password) {
-            return res.status(400).json({ error: 'Email e senha são obrigatórios' });
-        }
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Todos os campos obrigatórios devem ser preenchidos!' });
+  }
 
-        const user = await User.findByEmail(email);
-        if (!user) {
-            return res.status(400).json({ error: 'Usuário não encontrado' });
-        }
-
-        const validPassword = await bcrypt.compare(password, user.password);
-        if (!validPassword) {
-            return res.status(400).json({ error: 'Senha incorreta' });
-        }
-
-        const token = jwt.sign({ userId: user.id }, SECRET_KEY, { expiresIn: '1h' });
-
-        res.json({ message: 'Login bem-sucedido', token });
-    } catch (error) {
-        console.error('Erro ao fazer login:', error);
-        res.status(500).json({ error: 'Erro interno do servidor' });
+  try {
+    const user = await User.findByEmail(email);
+    if (!user) {
+      return res.status(400).json({ error: 'Usuário não encontrado.' });
     }
+
+    const isMatch = bcrypt.compareSync(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Senha incorreta.' });
+    }
+
+    const token = generateToken(user);
+    res.status(200).json({ message: 'Login bem-sucedido!', token });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erro ao processar login.' });
+  }
 };
+
+module.exports = { register, login };

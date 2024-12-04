@@ -1,22 +1,32 @@
-// server.js
 const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const taskRoutes = require('./src/routes/tasks');  // Importa as rotas de tarefas
-const authRoutes = require('./src/routes/auth');    // Importa as rotas de autenticação
+const dotenv = require('dotenv');
+const authRoutes = require('./src/routes/auth');
+const taskRoutes = require('./src/routes/tasks');
+const exportImportRoutes = require('./src/routes/exportImport');
+const fileUpload = require('express-fileupload'); // Importando express-fileupload
+
+dotenv.config();
 
 const app = express();
-const PORT = 3000;
 
-// Middleware
-app.use(bodyParser.json());  // Para parsing de JSON no corpo das requisições
-app.use(cors());            // Permite requisições de diferentes origens
+// Middleware para lidar com JSON
+app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // Para lidar com dados de formulários, se necessário
+
+// Middleware para upload de arquivos
+app.use(fileUpload({
+  limits: { fileSize: 10 * 1024 * 1024 }, // Limite de 10MB por arquivo
+  abortOnLimit: true, // Abortar upload se exceder o limite
+  responseOnLimit: 'O arquivo enviado é muito grande.',
+}));
 
 // Rotas
-app.use('/tasks', taskRoutes); // Define o middleware para as rotas de tarefas
-app.use('/auth', authRoutes);  // Define o middleware para as rotas de autenticação
+app.use('/api/auth', authRoutes); // Rota de autenticação
+app.use('/api/tasks', taskRoutes); // Rota de tarefas
+app.use('/api/import-export', exportImportRoutes); // Rota de exportação/importação
 
-// Iniciar servidor
-app.listen(PORT, () => {
-    console.log(`Servidor rodando em http://localhost:${PORT}`);
+// Inicia o servidor
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Servidor rodando na porta http://localhost:${port}`);
 });

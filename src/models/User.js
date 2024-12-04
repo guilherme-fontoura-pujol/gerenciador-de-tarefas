@@ -1,28 +1,28 @@
-// models/User.js
-const db = require('../database'); // Conexão com o banco de dados
+const db = require('../database');
 
-// Função para criar um novo usuário
-exports.createUser = async (email, passwordHash) => {
-    const query = 'INSERT INTO users (email, password) VALUES (?, ?)';
-    return new Promise((resolve, reject) => {
-        db.query(query, [email, passwordHash], (err, result) => {
-            if (err) {
-                return reject(err);
-            }
-            resolve(result);
-        });
-    });
-};
+const User = {
+  create: async (user) => {
+    const { email, password, name, picture } = user;
+    const query = 'INSERT INTO users (email, password, name, picture) VALUES (?, ?, ?, ?)';
+    try {
+      const [result] = await db.promise().query(query, [email, password, name, picture]);
+      return result;
+    } catch (error) {
+      console.error('Erro ao criar usuário:', error);
+      throw error;
+    }
+  },
 
-// Função para encontrar um usuário pelo email
-exports.getUserByEmail = async (email) => {
+  findByEmail: async (email) => {
     const query = 'SELECT * FROM users WHERE email = ?';
-    return new Promise((resolve, reject) => {
-        db.query(query, [email], (err, results) => {
-            if (err) {
-                return reject(err);
-            }
-            resolve(results[0]); // Retorna o primeiro usuário encontrado
-        });
-    });
+    try {
+      const [results] = await db.promise().query(query, [email]);
+      return results[0];
+    } catch (error) {
+      console.error('Erro ao buscar usuário por email:', error);
+      throw error;
+    }
+  },
 };
+
+module.exports = User;

@@ -6,7 +6,7 @@ module.exports = (req, res, next) => {
     const userId = req.user.id; // ID do usuário autenticado
 
     // Verifica se a tarefa pertence ao usuário
-    db.query('SELECT * FROM tasks WHERE id = ? AND user_id = ?', [taskId, userId], (err, results) => {
+    db.query('SELECT * FROM tarefas WHERE id = ? AND user_id = ?', [taskId, userId], (err, results) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }

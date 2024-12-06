@@ -6,13 +6,13 @@ const db = require('../database');
 exports.exportTasksJSON = async (req, res) => {
     try {
         const userId = req.user.userId; // Pega o ID do usuário autenticado
-        const [tasks] = await db.promise().query('SELECT * FROM tasks WHERE user_id = ?', [userId]);
-        const fileName = `tasks_${userId}_${Date.now()}.json`;
+        const [tarefas] = await db.promise().query('SELECT * FROM tarefas WHERE user_id = ?', [userId]);
+        const fileName = `tarefas_${userId}_${Date.now()}.json`;
 
         // Cria a pasta 'exports' caso ela não exista
         if (!fs.existsSync('./exports')) fs.mkdirSync('./exports');
 
-        fs.writeFileSync(`./exports/${fileName}`, JSON.stringify(tasks, null, 2));
+        fs.writeFileSync(`./exports/${fileName}`, JSON.stringify(tarefas, null, 2));
         res.json({ message: 'Tarefas exportadas com sucesso!', file: fileName });
     } catch (error) {
         console.error('Erro ao exportar tarefas em JSON:', error);
@@ -24,12 +24,12 @@ exports.exportTasksJSON = async (req, res) => {
 exports.exportTasksXML = async (req, res) => {
     try {
         const userId = req.user.userId; // Pega o ID do usuário autenticado
-        const [tasks] = await db.promise().query('SELECT * FROM tasks WHERE user_id = ?', [userId]);
+        const [tarefas] = await db.promise().query('SELECT * FROM tarefas WHERE user_id = ?', [userId]);
 
         const builder = new xml2js.Builder();
-        const xml = builder.buildObject({ tasks: tasks });
+        const xml = builder.buildObject({ tarefas: tarefas });
 
-        const fileName = `tasks_${userId}_${Date.now()}.xml`;
+        const fileName = `tarefas_${userId}_${Date.now()}.xml`;
 
         // Cria a pasta 'exports' caso ela não exista
         if (!fs.existsSync('./exports')) fs.mkdirSync('./exports');
@@ -52,10 +52,10 @@ exports.importTasksJSON = async (req, res) => {
             return res.status(400).json({ error: 'Nenhum arquivo foi enviado.' });
         }
 
-        const tasks = JSON.parse(file.data.toString());
-        for (const task of tasks) {
+        const tarefas = JSON.parse(file.data.toString());
+        for (const task of tarefas) {
             await db.promise().query(
-                'INSERT INTO tasks (user_id, title, description, status) VALUES (?, ?, ?, ?)',
+                'INSERT INTO tarefas (user_id, title, description, status) VALUES (?, ?, ?, ?)',
                 [userId, task.title, task.description, task.status]
             );
         }
@@ -80,13 +80,13 @@ exports.importTasksXML = async (req, res) => {
         const parser = new xml2js.Parser();
         const parsedData = await parser.parseStringPromise(file.data.toString());
 
-        if (!parsedData.tasks || !Array.isArray(parsedData.tasks.task)) {
+        if (!parsedData.tarefas || !Array.isArray(parsedData.tarefas.task)) {
             return res.status(400).json({ error: 'Formato XML inválido.' });
         }
 
-        for (const task of parsedData.tasks.task) {
+        for (const task of parsedData.tarefas.task) {
             await db.promise().query(
-                'INSERT INTO tasks (user_id, title, description, status) VALUES (?, ?, ?, ?)',
+                'INSERT INTO tarefas (user_id, title, description, status) VALUES (?, ?, ?, ?)',
                 [userId, task.title[0], task.description[0], task.status[0]]
             );
         }

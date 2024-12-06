@@ -11,14 +11,13 @@ function generateToken(user) {
 
 // Registro de usuário
 const register = async (req, res) => {
-  console.log('Rota /register foi chamada', req.body); // Log para depuração
-  const { email, password, name, picture } = req.body;
-
-  if (!email || !password || !name) {
-    return res.status(400).json({ error: 'Todos os campos obrigatórios devem ser preenchidos!' });
-  }
-
   try {
+    const { email, password, name, picture } = req.body;
+
+    if (!email || !password || !name) {
+      return res.status(400).json({ error: 'Todos os campos obrigatórios devem ser preenchidos!' });
+    }
+
     const existingUser = await User.findByEmail(email);
     if (existingUser) {
       return res.status(400).json({ error: 'Este email já está em uso.' });
@@ -30,7 +29,7 @@ const register = async (req, res) => {
     await User.create(newUser);
     res.status(201).json({ message: 'Usuário registrado com sucesso!' });
   } catch (err) {
-    console.error(err);
+    console.error('Erro na rota de registro:', err);
     res.status(500).json({ error: 'Erro ao criar o usuário.' });
   }
 };
@@ -62,4 +61,56 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register, login };
+// Listar todos os usuários
+const listUsers = async (req, res) => {
+  try {
+    const users = await User.getAll();
+    res.status(200).json(users);
+  } catch (err) {
+    console.error('Erro ao listar usuários:', err);
+    res.status(500).json({ error: 'Erro ao listar usuários.' });
+  }
+};
+
+// Atualizar informações do usuário
+const updateUser = async (req, res) => {
+  const userId = req.params.id;
+  const { name, picture } = req.body;
+
+  if (!name && !picture) {
+    return res.status(400).json({ error: 'Nenhum dado para atualizar foi enviado.' });
+  }
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'Usuário não encontrado.' });
+    }
+
+    await User.update(userId, { name, picture });
+    res.status(200).json({ message: 'Usuário atualizado com sucesso!' });
+  } catch (err) {
+    console.error('Erro ao atualizar usuário:', err);
+    res.status(500).json({ error: 'Erro ao atualizar usuário.' });
+  }
+};
+
+// Deletar um usuário
+const deleteUser = async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'Usuário não encontrado.' });
+    }
+
+    await User.delete(userId);
+    res.status(200).json({ message: 'Usuário deletado com sucesso!' });
+  } catch (err) {
+    console.error('Erro ao deletar usuário:', err);
+    res.status(500).json({ error: 'Erro ao deletar usuário.' });
+  }
+};
+
+module.exports = { register, login, listUsers, updateUser, deleteUser };

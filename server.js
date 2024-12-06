@@ -14,13 +14,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // Para lidar com dados de formulários, se necessário
 
 // Middleware para upload de arquivos
-app.use(fileUpload({
-  limits: { fileSize: 10 * 1024 * 1024 }, // Limite de 10MB por arquivo
-  abortOnLimit: true, // Abortar upload se exceder o limite
-  responseOnLimit: 'O arquivo enviado é muito grande.',
-}));
+app.use(
+  fileUpload({
+    limits: { fileSize: 10 * 1024 * 1024 }, // Limite de 10MB por arquivo
+    abortOnLimit: true, // Abortar upload se exceder o limite
+    responseOnLimit: 'O arquivo enviado é muito grande.',
+  })
+);
 
-// Rotas
+// Log temporário para verificar o carregamento das rotas
+console.log('Carregando rotas de autenticação...');
 app.use('/api/auth', authRoutes); // Rota de autenticação
 app.use('/api/tasks', taskRoutes); // Rota de tarefas
 app.use('/api/import-export', exportImportRoutes); // Rota de exportação/importação

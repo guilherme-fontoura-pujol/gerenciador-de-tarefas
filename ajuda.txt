@@ -1,0 +1,95 @@
+USUÁRIOS
+
+(POST)-Rota para registro de usuários:
+http://localhost:3000/api/auth/register
+Exemplo:
+Headers: Content-Type: application/json
+Body:
+{
+  "email": "novousuario@example.com",
+  "password": "senha123",
+  "name": "Novo Usuário",
+  "picture": "https://example.com/imagem.png"
+}
+
+(POST)-Rota para login de usuários:
+http://localhost:3000/api/auth/login
+Exemplo:
+Headers: Content-Type: application/json
+Body:
+{
+  "email": "novousuario@example.com",
+  "password": "senha123"
+}
+
+(GET)-Rota para listar usuários:
+http://localhost:3000/api/auth/users
+Headers: Authorization: Bearer <TOKEN>
+
+(PUT)-Rota para atualizar usuários:
+http://localhost:3000/api/auth/users/<id>
+Exemplo:
+Headers: 
+Authorization: Bearer <TOKEN>
+Content-Type: application/json
+Body:
+{
+  "name": "Usuário Atualizado",
+  "picture": "https://example.com/nova-imagem.png"
+}
+
+(DELETE)-Rota para deletar usuários:
+http://localhost:3000/api/auth/users/<id>
+Headers: 
+Authorization: Bearer <TOKEN>
+
+TAREFAS
+
+(POST)-Rota para criar tarefas:
+http://localhost:3000/api/tasks
+Exemplo:
+Headers: 
+Authorization: Bearer <TOKEN>
+Content-Type: application/json
+Body:
+{
+  "title": "Minha primeira tarefa",
+  "description": "Descrição da tarefa",
+  "prioridade": "alta"
+}
+
+(GET)-Rota para listar tarefas:
+http://localhost:3000/api/tasks
+Headers: 
+Authorization: Bearer <TOKEN>
+
+(PUT)-Rota para atualizar tarefas:
+http://localhost:3000/api/tasks/<id>
+Exemplo:
+Headers: 
+Authorization: Bearer <TOKEN>
+Content-Type: application/json
+Body:
+{
+  "title": "Título atualizado",
+  "description": "Descrição atualizada",
+  "prioridade": "media",
+  "status": "concluida"
+}
+
+(DELETE)-Rota para deletar tarefas:
+http://localhost:3000/api/tasks/<id>
+Headers: 
+Authorization: Bearer <TOKEN>
+
+(GET)-Rota para exportar tarefas:
+http://localhost:3000/api/import-export/export/json
+Headers: 
+Authorization: Bearer <TOKEN>
+
+(POST)-Rota para importar tarefas:
+http://localhost:3000/api/import-export/import/json
+Headers: 
+Authorization: Bearer <TOKEN>
+Body:
+form-data - <arquivo json>

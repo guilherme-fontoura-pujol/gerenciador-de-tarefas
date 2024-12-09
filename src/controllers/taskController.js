@@ -1,6 +1,5 @@
 const db = require('../database');
 
-// Função para listar todas as tarefas
 exports.getAllTasks = async (req, res) => {
   const userId = req.user.userId;
 
@@ -8,12 +7,11 @@ exports.getAllTasks = async (req, res) => {
     const [tarefas] = await db.promise().query('SELECT * FROM tarefas WHERE user_id = ?', [userId]);
     res.json(tarefas);
   } catch (error) {
-    console.error("Erro ao listar tarefas:", error); // Log do erro
+    console.error("Erro ao listar tarefas:", error); 
     res.status(500).json({ error: 'Erro ao listar tarefas' });
   }
 };
 
-// Função para criar uma nova tarefa
 exports.createTask = async (req, res) => {
   const { title, description, prioridade } = req.body;
   const userId = req.user.userId;
@@ -29,12 +27,11 @@ exports.createTask = async (req, res) => {
     );
     res.status(201).json({ message: 'Tarefa criada com sucesso', taskId: result.insertId });
   } catch (error) {
-    console.error("Erro ao criar tarefa:", error); // Log do erro
+    console.error("Erro ao criar tarefa:", error); 
     res.status(500).json({ error: 'Erro ao criar tarefa' });
   }
 };
 
-// Função para atualizar uma tarefa
 exports.updateTask = async (req, res) => {
   const { title, description, prioridade, status } = req.body;
   const taskId = req.params.id;
@@ -51,12 +48,11 @@ exports.updateTask = async (req, res) => {
 
     res.json({ message: 'Tarefa atualizada com sucesso' });
   } catch (error) {
-    console.error("Erro ao atualizar tarefa:", error); // Log do erro
+    console.error("Erro ao atualizar tarefa:", error);
     res.status(500).json({ error: 'Erro ao atualizar tarefa' });
   }
 };
 
-// Função para excluir uma tarefa
 exports.deleteTask = async (req, res) => {
   const taskId = req.params.id;
 
@@ -69,7 +65,7 @@ exports.deleteTask = async (req, res) => {
 
     res.json({ message: 'Tarefa excluída com sucesso' });
   } catch (error) {
-    console.error("Erro ao excluir tarefa:", error); // Log do erro
+    console.error("Erro ao excluir tarefa:", error);
     res.status(500).json({ error: 'Erro ao excluir tarefa' });
   }
 };

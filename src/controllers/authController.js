@@ -2,14 +2,12 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-// Função para gerar o token JWT
 function generateToken(user) {
   return jwt.sign({ userId: user.id, email: user.email }, process.env.JWT_SECRET, {
     expiresIn: '1h',
   });
 }
 
-// Registro de usuário
 const register = async (req, res) => {
   try {
     const { email, password, name, picture } = req.body;
@@ -34,7 +32,6 @@ const register = async (req, res) => {
   }
 };
 
-// Login de usuário
 const login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -61,7 +58,6 @@ const login = async (req, res) => {
   }
 };
 
-// Listar todos os usuários
 const listUsers = async (req, res) => {
   try {
     const users = await User.getAll();
@@ -72,7 +68,6 @@ const listUsers = async (req, res) => {
   }
 };
 
-// Atualizar informações do usuário
 const updateUser = async (req, res) => {
   const userId = req.params.id;
   const { name, picture } = req.body;
@@ -95,7 +90,6 @@ const updateUser = async (req, res) => {
   }
 };
 
-// Deletar um usuário
 const deleteUser = async (req, res) => {
   const userId = req.params.id;
 

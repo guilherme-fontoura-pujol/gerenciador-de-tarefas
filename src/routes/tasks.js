@@ -3,7 +3,6 @@ const ensureAuthenticated = require('../middlewares/ensureAuthenticated');
 const taskController = require('../controllers/taskController');
 const router = express.Router();
 
-// Rotas para tarefas
 router.get('/', ensureAuthenticated, taskController.getAllTasks);
 router.post('/', ensureAuthenticated, taskController.createTask);
 router.put('/:id', ensureAuthenticated, taskController.updateTask);

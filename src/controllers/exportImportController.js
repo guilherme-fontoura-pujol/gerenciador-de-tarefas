@@ -1,15 +1,14 @@
 const fs = require('fs');
-const xml2js = require('xml2js'); // Para converter JSON em XML e vice-versa
+const xml2js = require('xml2js');
 const db = require('../database');
 
-// Função para exportar tarefas em JSON
 exports.exportTasksJSON = async (req, res) => {
     try {
-        const userId = req.user.userId; // Pega o ID do usuário autenticado
+        const userId = req.user.userId;
         const [tarefas] = await db.promise().query('SELECT * FROM tarefas WHERE user_id = ?', [userId]);
         const fileName = `tarefas_${userId}_${Date.now()}.json`;
 
-        // Cria a pasta 'exports' caso ela não exista
+  
         if (!fs.existsSync('./exports')) fs.mkdirSync('./exports');
 
         fs.writeFileSync(`./exports/${fileName}`, JSON.stringify(tarefas, null, 2));
@@ -20,10 +19,9 @@ exports.exportTasksJSON = async (req, res) => {
     }
 };
 
-// Função para exportar tarefas em XML
 exports.exportTasksXML = async (req, res) => {
     try {
-        const userId = req.user.userId; // Pega o ID do usuário autenticado
+        const userId = req.user.userId; 
         const [tarefas] = await db.promise().query('SELECT * FROM tarefas WHERE user_id = ?', [userId]);
 
         const builder = new xml2js.Builder();
@@ -31,7 +29,6 @@ exports.exportTasksXML = async (req, res) => {
 
         const fileName = `tarefas_${userId}_${Date.now()}.xml`;
 
-        // Cria a pasta 'exports' caso ela não exista
         if (!fs.existsSync('./exports')) fs.mkdirSync('./exports');
 
         fs.writeFileSync(`./exports/${fileName}`, xml);
@@ -42,11 +39,10 @@ exports.exportTasksXML = async (req, res) => {
     }
 };
 
-// Função para importar tarefas de um arquivo JSON
 exports.importTasksJSON = async (req, res) => {
     try {
-        const userId = req.user.userId; // ID do usuário autenticado
-        const { file } = req.files; // Arquivo enviado
+        const userId = req.user.userId;
+        const { file } = req.files;
 
         if (!file) {
             return res.status(400).json({ error: 'Nenhum arquivo foi enviado.' });
@@ -67,11 +63,10 @@ exports.importTasksJSON = async (req, res) => {
     }
 };
 
-// Função para importar tarefas de um arquivo XML
 exports.importTasksXML = async (req, res) => {
     try {
-        const userId = req.user.userId; // ID do usuário autenticado
-        const { file } = req.files; // Arquivo enviado
+        const userId = req.user.userId;
+        const { file } = req.files;
 
         if (!file) {
             return res.status(400).json({ error: 'Nenhum arquivo foi enviado.' });
